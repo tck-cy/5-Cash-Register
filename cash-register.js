@@ -1,60 +1,70 @@
-//starting
 function checkCashRegister(price, cash, cid) {
-    let changeAmount = price - cash;
-    let changeArray = [];
-    let AmountInDrawer;
-    console.log(cid);
-   // let OtherVar = cid.map(arr => arr)
-   let lookup = {
-    "PENNY": 0.01, 
-    "NICKEL": 0.05,
-    "DIME": 0.1,
-    "QUARTER": 0.25,
-    "ONE": 1,
-    "FIVE": 5,
-    "TEN": 10,
-    "TWENTY": 20,
-    "ONE HUNDRED": 100
-   }
-   class ResultClosed {
-    constructor() {
-        this.status = 'CLOSED',
-        this.change = [];
+    let lookup = {
+        "PENNY": 0.01, 
+        "NICKEL": 0.05,
+        "DIME": 0.1,
+        "QUARTER": 0.25,
+        "ONE": 1,
+        "FIVE": 5,
+        "TEN": 10,
+        "TWENTY": 20,
+        "ONE HUNDRED": 100
+       }
+    // Calculate the change amount
+    let changeAmount = cash - price;
+  
+    // Calculate the total cash in the drawer
+    let totalCash = cid.reduce((acc, item) => acc + item[1], 0);
+  
+    // Return an object with the "INSUFFICIENT_FUNDS" status if the total cash is less than the change amount
+    if (totalCash < changeAmount) {
+      return { status: "INSUFFICIENT_FUNDS", change: [] };
     }
-}
-
-class ResultLess {
-    constructor() {
-        this.status = 'INSUFFICIENT_FUNDS',
-        this.change = [];
+  
+    // Return an object with the "CLOSED" status if the total cash is equal to the change amount
+    if (totalCash == changeAmount) {
+      return { status: "CLOSED", change: cid };
     }
-}
-class ResultOpen {
-    constructor() {
-        this.status = 'OPEN',
-        this.change = [];
+  
+    // Sort the denominations in descending order
+    let denominations = Object.keys(lookup).sort((a, b) => lookup[b] - lookup[a]);
+  
+    // Initialize the change array
+    let change = [];
+  
+    // Loop through the denominations and calculate the change
+    for (let i = 0; i < denominations.length; i++) {
+      let denomination = denominations[i];
+      let value = lookup[denomination];
+  
+      if (changeAmount >= value) {
+        // Calculate the number of coins or bills needed
+        let numCoins = Math.floor(changeAmount / value);
+        let changeValue = numCoins * value;
+  
+        // Check if there are enough bills or coins available
+        let item = cid.find((item) => item[0] == denomination);
+        if (item[1] < changeValue) {
+          changeValue = item[1];
+          numCoins = Math.floor(changeValue / value);
+        }
+  
+        // Add the coins or bills to the change array
+        change.push([denomination, changeValue]);
+  
+        // Subtract the change value from the change amount
+        changeAmount = (changeAmount - changeValue).toFixed(2);
+      }
     }
-}
-   let totalCash = 0;
-   let mArray = []
-   for (let i =0; i < cid.length; i++) {
-    let initial = 0
-        let key = cid[i][0];
-        let multiplier = mArray.push(cid[i][1]);
-        let lookupValue  = lookup[key];
-        totalCash = mArray.reduce((acc, multiplier) => acc + multiplier, initial).toFixed(2);
-   }
-   console.log(totalCash);
-   if (totalCash < price) {
-    return new ResultLess;
-   }
-   if (totalCash == price) {
-    let answer = new ResultClosed;
-    answer.change = cid;
-    return answer;
-   }
-
-   if (totalCash > price) {}
+  
+    // Return an object with the "OPEN" status and the change array if the change amount is zero
+    if (changeAmount == 0) {
+      return { status: "OPEN", change };
+    }
+  
+    // Return an object with the "INSUFFICIENT_FUNDS" status if the change amount is greater than zero
+    return { status: "INSUFFICIENT_FUNDS", change: [] };
   }
   
-  console.log(checkCashRegister(19.5, 20, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]));
+  console.log(checkCashRegister(3.26, 100, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]));
+  
