@@ -12,9 +12,10 @@ function checkCashRegister(price, cash, cid) {
        }
     // Calculate the change amount
     let changeAmount = cash - price;
-  
+
     // Calculate the total cash in the drawer
     let totalCash = cid.reduce((acc, item) => acc + item[1], 0);
+
   
     // Return an object with the "INSUFFICIENT_FUNDS" status if the total cash is less than the change amount
     if (totalCash < changeAmount) {
@@ -28,15 +29,16 @@ function checkCashRegister(price, cash, cid) {
   
     // Sort the denominations in descending order
     let denominations = Object.keys(lookup).sort((a, b) => lookup[b] - lookup[a]);
-  
+
     // Initialize the change array
     let change = [];
   
     // Loop through the denominations and calculate the change
     for (let i = 0; i < denominations.length; i++) {
       let denomination = denominations[i];
+
       let value = lookup[denomination];
-  
+
       if (changeAmount >= value) {
         // Calculate the number of coins or bills needed
         let numCoins = Math.floor(changeAmount / value);
@@ -51,7 +53,6 @@ function checkCashRegister(price, cash, cid) {
   
         // Add the coins or bills to the change array
         change.push([denomination, changeValue]);
-  
         // Subtract the change value from the change amount
         changeAmount = (changeAmount - changeValue).toFixed(2);
       }
